@@ -1,23 +1,26 @@
 package controller
 
 import (
-	"crud-api/src/configuration/rest_err"
+	"crud-api/src/configuration/validation"
 	"crud-api/src/controller/model/request"
 	"fmt"
+	"log"
 
 	"github.com/gin-gonic/gin"
 )
 
 func CreateUser(c *gin.Context) {
-
+	log.Println("Init CreateUser controller")
 	var userRequest request.UserRequest
 
 	if err := c.ShouldBindJSON(&userRequest); err != nil {
-		restErr := rest_err.NewBadRequestError(
-			fmt.Sprintf("There are some incorrect filds, error=%s", err))
-		c.JSON(restErr.Code, restErr)
+		log.Printf("Error trying to marshal object, error=%s\n\n", err.Error())
+		errRest := validation.ValidateUserError(err)
+
+		c.JSON(errRest.Code, errRest)
 		return
 	}
 
 	fmt.Println(userRequest)
+
 }
