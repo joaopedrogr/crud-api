@@ -1,53 +1,30 @@
 package model
 
 import (
-	"crud-api/src/configuration/rest_err"
 	"crypto/md5"
 	"encoding/hex"
 )
 
-func NewUserDomain(
-	email, password, name string,
-	age int8,
-) UserDomainInterface {
+type UserDomainInterface interface {
+	GetEmail() string
+	GetPassword() string
+	GetAge() int
+	GetName() string
+
+	EncryptPassword()
+}
+
+func NewUserDomain(email, password, name string, age int) UserDomainInterface {
 	return &userDomain{
-		email:    email,
-		password: password,
-		name:     name,
-		age:      age,
+		email, password, name, age,
 	}
 }
 
 type userDomain struct {
-	id       string
 	email    string
 	password string
 	name     string
-	age      int8
-}
-
-func (ud *userDomain) CreateUser() *rest_err.RestErr {
-	return nil
-}
-
-func (ud *userDomain) UpdateUser(s string, domain userDomain) *rest_err.RestErr {
-	return nil
-}
-
-func (ud *userDomain) FindUser(s string) (*userDomain, *rest_err.RestErr) {
-	return nil, nil
-}
-
-func (ud *userDomain) DeleteUser(s string) *rest_err.RestErr {
-	return nil
-}
-
-func (ud *userDomain) GetID() string {
-	return ud.id
-}
-
-func (ud *userDomain) SetID(id string) {
-	ud.id = id
+	age      int
 }
 
 func (ud *userDomain) GetEmail() string {
@@ -62,7 +39,7 @@ func (ud *userDomain) GetName() string {
 	return ud.name
 }
 
-func (ud *userDomain) GetAge() int8 {
+func (ud *userDomain) GetAge() int {
 	return ud.age
 }
 
@@ -71,13 +48,4 @@ func (ud *userDomain) EncryptPassword() {
 	defer hash.Reset()
 	hash.Write([]byte(ud.password))
 	ud.password = hex.EncodeToString(hash.Sum(nil))
-}
-
-type UserDomainInterface interface {
-	CreateUser() *rest_err.RestErr
-	UpdateUser(string, userDomain) *rest_err.RestErr
-	FindUser(string) (*userDomain, *rest_err.RestErr)
-	DeleteUser(string) *rest_err.RestErr
-	GetPassword() string
-	EncryptPassword()
 }

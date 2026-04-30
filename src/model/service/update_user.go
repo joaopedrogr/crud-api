@@ -5,6 +5,9 @@ import (
 	"crud-api/src/model"
 )
 
-func (*userDomainService) UpdateUser(userID string, userDomain model.UserDomainInterface) *rest_err.RestErr {
+func (*userDomainService) UpdateUser(
+	userId string,
+	userDomain model.UserDomainInterface,
+) *rest_err.RestErr {
 	return nil
 }

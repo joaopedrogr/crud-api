@@ -5,6 +5,7 @@ import (
 	"crud-api/src/model"
 )
 
-func (*userDomainService) FindUser(string) (*model.UserDomainInterface, *rest_err.RestErr) {
+func (*userDomainService) FindUser(string) (
+	*model.UserDomainInterface, *rest_err.RestErr) {
 	return nil, nil
 }

@@ -9,28 +9,18 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"go.uber.org/zap/zapcore"
-)
-
-var (
-	UserDomainInterface model.UserDomainInterface
+	"go.uber.org/zap"
 )
 
 func CreateUser(c *gin.Context) {
 	logger.Info("Init CreateUser controller",
-		zapcore.Field{
-			Key:    "journey",
-			String: "createUser",
-		},
+		zap.String("journey", "createUser"),
 	)
 	var userRequest request.UserRequest
 
 	if err := c.ShouldBindJSON(&userRequest); err != nil {
 		logger.Error("Error trying to validate user info", err,
-			zapcore.Field{
-				Key:    "journey",
-				String: "createUser",
-			})
+			zap.String("journey", "createUser"))
 		errRest := validation.ValidateUserError(err)
 
 		c.JSON(errRest.Code, errRest)
@@ -41,22 +31,18 @@ func CreateUser(c *gin.Context) {
 		userRequest.Email,
 		userRequest.Password,
 		userRequest.Name,
-		int8(userRequest.Age),
+		userRequest.Age,
 	)
 
-	service := service.NewUserService()
+	service := service.NewUserDomainService()
 
-	if err := domain.CreateUser(domain); err != nil {
+	if err := service.CreateUser(domain); err != nil {
 		c.JSON(err.Code, err)
 		return
 	}
 
 	logger.Info("User created successfully",
-		zapcore.Field{
-			Key:    "journey",
-			String: "createUser",
-		})
+		zap.String("journey", "createUser"))
 
 	c.String(http.StatusOK, "")
-
 }

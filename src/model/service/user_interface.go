@@ -2,48 +2,19 @@ package service
 
 import (
 	"crud-api/src/configuration/rest_err"
+	"crud-api/src/model"
 )
 
-type UserDomainInterface interface {
-	GetEmail() string
-	GetPassword() string
-	GetAge() int8
-	GetName() string
-	GetID() string
-
-	SetID(string)
-
-	EncryptPassword()
-	GenerateToken() (string, *rest_err.RestErr)
+func NewUserDomainService() UserDomainService {
+	return &userDomainService{}
 }
 
-func NewUserDomain(
-	email, password, name string,
-	age int8,
-) UserDomainInterface {
-	return &userDomain{
-		email:    email,
-		password: password,
-		name:     name,
-		age:      age,
-	}
+type userDomainService struct {
 }
 
-func NewUserLoginDomain(
-	email, password string,
-) UserDomainInterface {
-	return &userDomain{
-		email:    email,
-		password: password,
-	}
-}
-
-func NewUserUpdateDomain(
-	name string,
-	age int8,
-) UserDomainInterface {
-	return &userDomain{
-		name: name,
-		age:  age,
-	}
+type UserDomainService interface {
+	CreateUser(model.UserDomainInterface) *rest_err.RestErr
+	UpdateUser(string, model.UserDomainInterface) *rest_err.RestErr
+	FindUser(string) (*model.UserDomainInterface, *rest_err.RestErr)
+	DeleteUser(string) *rest_err.RestErr
 }
