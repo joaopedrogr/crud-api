@@ -1,6 +1,7 @@
 package main
 
 import (
+	"crud-api/src/configuration/logger"
 	"crud-api/src/controller/routes"
 	"log"
 
@@ -9,6 +10,8 @@ import (
 )
 
 func main() {
+	logger.Info("About to start user application")
+
 	err := godotenv.Load()
 	if err != nil {
 		log.Fatal("Error loading .env file")
