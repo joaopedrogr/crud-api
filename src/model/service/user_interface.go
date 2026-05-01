@@ -3,13 +3,18 @@ package service
 import (
 	"crud-api/src/configuration/rest_err"
 	"crud-api/src/model"
+
+	"go.mongodb.org/mongo-driver/v2/mongo"
 )
 
-func NewUserDomainService() UserDomainService {
-	return &userDomainService{}
+func NewUserDomainService(db *mongo.Database) *userDomainService {
+	return &userDomainService{
+		db: db,
+	}
 }
 
 type userDomainService struct {
+	db *mongo.Database
 }
 
 type UserDomainService interface {
