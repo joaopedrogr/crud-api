@@ -10,11 +10,16 @@ import (
 	"go.mongodb.org/mongo-driver/v2/mongo/readpref"
 )
 
-func NewMongoDBConnection() (*mongo.Client, error) {
+var (
+	MONGODB_URL     = os.Getenv("MONGO_URL")
+	MONGODB_USER_DB = os.Getenv("MONGO_DBNAME")
+)
+
+func NewMongoDBConnection() (*mongo.Database, error) {
 	serverAPI := options.ServerAPI(options.ServerAPIVersion1)
 
 	opts := options.Client().
-		ApplyURI(os.Getenv("MONGODB_URL")).
+		ApplyURI(os.Getenv(MONGODB_URL)).
 		SetServerAPIOptions(serverAPI)
 
 	client, err := mongo.Connect(opts)
@@ -28,5 +33,5 @@ func NewMongoDBConnection() (*mongo.Client, error) {
 
 	fmt.Println("Pinged your deployment. You successfully connected to MongoDB!")
 
-	return client, nil
+	return client.Database(MONGODB_USER_DB), nil
 }
