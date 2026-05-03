@@ -4,9 +4,7 @@ import (
 	"context"
 	"crud-api/src/configuration/database/mongodb"
 	"crud-api/src/configuration/logger"
-	"crud-api/src/controller"
 	"crud-api/src/controller/routes"
-	"crud-api/src/model/service"
 	"log"
 
 	"github.com/gin-gonic/gin"
@@ -19,21 +17,20 @@ func main() {
 	err := godotenv.Load()
 	if err != nil {
 		log.Fatal("Error loading .env file")
+		return
 	}
 
-	client, err := mongodb.NewMongoDBConnection()
+	database, err := mongodb.NewMongoDBConnection(context.Background())
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf(
+			"Error trying to connect to database, error=%s \n",
+			err.Error())
+		return
 	}
-	defer client.Disconnect(context.TODO())
 
-	db := client.Database("crud-api")
-
-	service := service.NewUserDomainService(db)
-	userController := controller.NewUserControllerInterface(service)
+	userController := initDependencies(database)
 
 	router := gin.Default()
-
 	routes.InitRoutes(&router.RouterGroup, userController)
 
 	if err := router.Run(":8080"); err != nil {

@@ -3,23 +3,34 @@ package service
 import (
 	"crud-api/src/configuration/rest_err"
 	"crud-api/src/model"
-
-	"go.mongodb.org/mongo-driver/v2/mongo"
+	"crud-api/src/model/repository"
 )
 
-func NewUserDomainService(db *mongo.Database) *userDomainService {
-	return &userDomainService{
-		db: db,
-	}
+func NewUserDomainService(
+	userRepository repository.UserRepository,
+) UserDomainService {
+	return &userDomainService{userRepository}
 }
 
 type userDomainService struct {
-	db *mongo.Database
+	userRepository repository.UserRepository
 }
 
 type UserDomainService interface {
-	CreateUser(model.UserDomainInterface) *rest_err.RestErr
+	CreateUserServices(model.UserDomainInterface) (
+		model.UserDomainInterface, *rest_err.RestErr)
+
+	FindUserByIDServices(
+		id string,
+	) (model.UserDomainInterface, *rest_err.RestErr)
+	FindUserByEmailServices(
+		email string,
+	) (model.UserDomainInterface, *rest_err.RestErr)
+
 	UpdateUser(string, model.UserDomainInterface) *rest_err.RestErr
-	FindUser(string) (*model.UserDomainInterface, *rest_err.RestErr)
 	DeleteUser(string) *rest_err.RestErr
+
+	LoginUserServices(
+		userDomain model.UserDomainInterface,
+	) (model.UserDomainInterface, string, *rest_err.RestErr)
 }

@@ -10,8 +10,9 @@ import (
 	"fmt"
 	"os"
 
-	"go.mongodb.org/mongo-driver/v2/bson"
-	"go.mongodb.org/mongo-driver/v2/mongo"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
 	"go.uber.org/zap"
 )
 
@@ -68,7 +69,8 @@ func (ur *userRepository) FindUserByID(
 
 	userEntity := &entity.UserEntity{}
 
-	filter := bson.D{{Key: "_id", Value: id}}
+	objectId, _ := primitive.ObjectIDFromHex(id)
+	filter := bson.D{{Key: "_id", Value: objectId}}
 	err := collection.FindOne(
 		context.Background(),
 		filter,
@@ -94,6 +96,51 @@ func (ur *userRepository) FindUserByID(
 
 	logger.Info("FindUserByID repository executed successfully",
 		zap.String("journey", "findUserByID"),
+		zap.String("userId", userEntity.ID.Hex()))
+	return converter.ConvertEntityToDomain(*userEntity), nil
+}
+
+func (ur *userRepository) FindUserByEmailAndPassword(
+	email string,
+	password string,
+) (model.UserDomainInterface, *rest_err.RestErr) {
+	logger.Info("Init findUserByEmailAndPassword repository",
+		zap.String("journey", "findUserByEmailAndPassword"))
+
+	collection_name := os.Getenv(MONGODB_USER_DB)
+	collection := ur.databaseConnection.Collection(collection_name)
+
+	userEntity := &entity.UserEntity{}
+
+	filter := bson.D{
+		{Key: "email", Value: email},
+		{Key: "password", Value: password},
+	}
+	err := collection.FindOne(
+		context.Background(),
+		filter,
+	).Decode(userEntity)
+
+	if err != nil {
+		if err == mongo.ErrNoDocuments {
+			errorMessage := "User or password is invalid"
+			logger.Error(errorMessage,
+				err,
+				zap.String("journey", "findUserByEmailAndPassword"))
+
+			return nil, rest_err.NewForbiddenError(errorMessage)
+		}
+		errorMessage := "Error trying to find user by email and password"
+		logger.Error(errorMessage,
+			err,
+			zap.String("journey", "findUserByEmailAndPassword"))
+
+		return nil, rest_err.NewInternalServerError(errorMessage)
+	}
+
+	logger.Info("FindUserByEmailAndPassword repository executed successfully",
+		zap.String("journey", "findUserByEmailAndPassword"),
+		zap.String("email", email),
 		zap.String("userId", userEntity.ID.Hex()))
 	return converter.ConvertEntityToDomain(*userEntity), nil
 }
