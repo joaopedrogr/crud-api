@@ -13,8 +13,15 @@ RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 GO111MODULE=on \
 
 FROM golang:1.19-alpine3.15 as runner
 
-COPY --from=BUILDER /app/crud-api .
+RUN adduser -D joaopedrogr
+
+COPY --from=BUILDER /app/crud-api /app/crud-api
+
+RUN chown -R joaopedrogr:joaopedrogr /app
+RUN chmod +x /app/crud-api
 
 EXPOSE 8080
+
+USER joaopedrogr
 
 CMD ["./crud-api"]
