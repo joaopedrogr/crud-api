@@ -1,6 +1,6 @@
 version: '3'
 services:
-  meuprimeirocrudgo:
+  crud-api:
     build:
       context: .
       dockerfile: Dockerfile
@@ -13,14 +13,14 @@ services:
     depends_on:
       - mongodb
     networks:
-      - meu_crud_network
+      - crud_network
 
   mongodb:
     image: mongo
     ports:
       - "27017:27017"
     networks:
-      - meu_crud_network
+      - crud_network
 
 networks:
-  meu_crud_network:
+  crud_network:
